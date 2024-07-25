@@ -20,4 +20,11 @@ app.use(
 app.use(express.static("public")) //Static files Check
 app.use(cookieParser()) //Cookies Check
 
+
+//ROUTES import
+import userRouter from './routes/user.routes.js'
+
+//routes declaration
+app.use("/api/v1/users",userRouter)
+
 export { app }

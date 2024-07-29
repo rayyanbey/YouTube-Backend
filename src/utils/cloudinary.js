@@ -1,34 +1,42 @@
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary } from "cloudinary"
 import fs from "fs"
-(async function() {
-
-    // Configuration
-    cloudinary.config({ 
-        cloud_name: process.env.CLOUD_API_NAME, 
-        api_key: process.env.CLOUD_API_KEY, 
-        api_secret: process.env.CLOUD_API_SECRET
-    });
-})();
-
-const uploadOnCloudinary = async (localFilePath)=>{
-   try {
-    if(!localFilePath){
-        return null
+import dotenv from 'dotenv'
+dotenv.config({
+  path: '../.env'
+})
+//Cloudinary Configuration
+cloudinary.config({
+  cloud_name: process.env.NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.SECRET,
+})
+console.log("Cloudinary Config: ", {
+  cloud_name: process.env.NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.SECRET,
+})
+const uploadOnCloudinary = async (localFilePath) => {
+  console.log("Local File Path:", localFilePath)
+  try {
+    if (!localFilePath) {
+      return null
     }
-    //upload on cloudinary
-    let response = await cloudinary.uploader.upload(localFilePath,
-        {
-            resource_type:"auto"
-        }
-    )
-    //Uploaded on Cloudinary
-    console.log("Uploaded on Cloudinary",response.url)
+
+    // Upload on Cloudinary
+    let response = await cloudinary.uploader.upload(localFilePath, {
+      resource_type: "auto",
+      public_id: "Images",
+    })
+
+    // Uploaded on Cloudinary
+    console.log("Uploaded on Cloudinary", response.url)
+    fs.unlinkSync(localFilePath)
     return response
-   } catch (error) {
-     fs.unlinkSync(localFilePath)  //remove the file from local server as the upload failed
-     return null
-   }
+  } catch (error) {
+    console.error("Error uploading to Cloudinary:", error)
+    fs.unlinkSync(localFilePath) // Remove the file from local server as the upload failed
+    return null
+  }
 }
 
-
-export {uploadOnCloudinary}
+export { uploadOnCloudinary }

@@ -10,11 +10,11 @@ cloudinary.config({
   api_key: process.env.API_KEY,
   api_secret: process.env.SECRET,
 })
-console.log("Cloudinary Config: ", {
-  cloud_name: process.env.NAME,
-  api_key: process.env.API_KEY,
-  api_secret: process.env.SECRET,
-})
+// console.log("Cloudinary Config: ", {
+//   cloud_name: process.env.NAME,
+//   api_key: process.env.API_KEY,
+//   api_secret: process.env.SECRET,
+// })
 const uploadOnCloudinary = async (localFilePath) => {
   console.log("Local File Path:", localFilePath)
   try {
@@ -24,8 +24,7 @@ const uploadOnCloudinary = async (localFilePath) => {
 
     // Upload on Cloudinary
     let response = await cloudinary.uploader.upload(localFilePath, {
-      resource_type: "auto",
-      public_id: "Images",
+      resource_type: "auto"
     })
 
     // Uploaded on Cloudinary

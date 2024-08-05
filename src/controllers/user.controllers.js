@@ -196,9 +196,36 @@ const refreshAccessToken = asyncHandler(async (req,res)=>{
   }
 })
 
+const changePassword = asyncHandler(async(req,res)=>{
+  const {oldPassword, newPassword, confirmPassword} = req.body
+  const user = await User.findById(req.user?._id)
+  const isCorrect = await user.isPasswordCorrect(oldPassword)
+  if(!isCorrect){
+     throw new ApiError(400,"Invalid Password")
+  }
+  if(newPassword !== confirmPassword){
+    throw new ApiError(400,"Passwords Don't Match")
+  }
+  user.password = newPassword
+  await user.save({validateBeforeSave: false})
+
+  return res.status(200)
+  .json(new ApiResponse(200,{},"Password Changes Successfully"))
+})
+
+//Change Avatar and coverImage
+
+const getCurrentuser = asyncHandler(async(req,res)=>{
+  return res.status(200)
+  .json(new ApiResponse(200,req.user,"Current User Fetched Successfully"))
+})
+
+
 export { 
   registerUser,
   loginUser,
   logoutUser,
-  refreshAccessToken
+  refreshAccessToken,
+  changePassword,
+  getCurrentuser
  }

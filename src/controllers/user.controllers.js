@@ -213,13 +213,33 @@ const changePassword = asyncHandler(async(req,res)=>{
   .json(new ApiResponse(200,{},"Password Changes Successfully"))
 })
 
-//Change Avatar and coverImage
-
 const getCurrentuser = asyncHandler(async(req,res)=>{
   return res.status(200)
   .json(new ApiResponse(200,req.user,"Current User Fetched Successfully"))
 })
 
+const updateUserDetails = asyncHandler(async(req,res)=>{
+  const {FullName,email} = req.body
+
+  if(!FullName|| !email){
+
+  }
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set:{
+      FullName: FullName,
+      email: email
+      }
+    },
+    {new: true}
+  ).select("-password")
+
+  user.save()
+  return res.status(200)
+  .json(new ApiResponse(200,req.user,"Updated Successfully"))
+
+})
 
 export { 
   registerUser,
@@ -227,5 +247,6 @@ export {
   logoutUser,
   refreshAccessToken,
   changePassword,
-  getCurrentuser
+  getCurrentuser,
+  updateUserDetails
  }

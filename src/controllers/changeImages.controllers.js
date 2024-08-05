@@ -6,10 +6,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 
 const changeAvatar = asyncHandler(async(req,res)=>{
-    const user = await User.findById(req.user?._id)
-    if(!user){
-        throw new ApiError(400,"User Not Found")
-    }
+    
     const avatarFilePath = req.files?.avatar[0]?.path
 
     if(!avatarFilePath){
@@ -21,21 +18,25 @@ const changeAvatar = asyncHandler(async(req,res)=>{
     if(!avatarResponse){
         throw new ApiError(400,"Avatar is Required")
     }
-
-    user.avatar = avatarResponse.url
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set:{
+                avatar: avatarResponse.url
+            }
+        },
+        {new: true}
+    ).select("-password")
     user.save({validateBeforeSave: false})
 
     console.log(user.avatar)
     return res.status(200)
-    .json(new ApiResponse(200,{},"Avatar image is updated"))
+    .json(new ApiResponse(200,user.avatar,"Avatar image is updated"))
     
 })
 
 const changeCoverImage = asyncHandler(async(req,res)=>{
-    const user = await User.findById(req.user?._id)
-    if(!user){
-        throw new ApiError(400,"User Not Found")
-    }
+    
     const coverFilePath = req.files?.coverImage[0]?.path
 
     if(!coverFilePath){
@@ -47,7 +48,16 @@ const changeCoverImage = asyncHandler(async(req,res)=>{
     if(!coverResponse){
         throw new ApiError(400,"Cover Image is Required")
     }
-
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set:{
+                coverImage: coverResponse.url
+            }
+        },
+        {new: true}
+    ).select("-password")
+    user.save({validateBeforeSave: false})
     user.coverImage = coverResponse.url
     user.save({validateBeforeSave: false})
 

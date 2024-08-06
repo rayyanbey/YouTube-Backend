@@ -241,6 +241,78 @@ const updateUserDetails = asyncHandler(async(req,res)=>{
 
 })
 
+
+const getUserChannelProfile = asyncHandler(async(req,res)=>{
+    const {username} = req.params || req.body
+
+    if(!username?.trim()){
+      //error 400
+    }
+
+  const channel = await User.aggregate([
+      {  //Stage 1
+        $match:{
+          username: username
+        }
+      },
+      { //Stage 2
+        $lookup:{
+          from: "subscriptions",
+          localField: "_id",
+          foreignField: "channel",
+          as: "subscribers"
+        }
+      },
+      { //Stage 3
+        $lookup:{
+          from: "subscriptions",
+          localField: "_id",
+          foreignField: "subscriber",
+          as: "subscribedTo"
+        }
+      },
+      {
+        $addFields:{
+          subscribersCount : {
+            $size:"$subscribers"
+          },
+          channelSubscribedToCount:{
+            $size:"$subscribedTo"
+          },
+          isSubscribed:{
+            $cond:{
+              if:{
+                $in: [req.user?._id,"$subscribers.subscriber"]
+              },
+              then: true,
+              else: false
+            }
+          }
+        }
+      },
+      {
+        $project:{
+          fullName: 1,
+          username: 1,
+          subscribersCount: 1,
+          channelSubscribedToCount: 1,
+          isSubscribed: 1,
+          avatar:1,
+          coverImage: 1,
+          email:1,
+        }
+      }
+  ])
+
+  if(!channel?.length){
+    //throw error
+  }
+
+  return res.status(200)
+  .json(new ApiResponse(200,channel[0],"Information regarding user fetcheds"))
+})
+
+
 export { 
   registerUser,
   loginUser,
@@ -248,5 +320,6 @@ export {
   refreshAccessToken,
   changePassword,
   getCurrentuser,
-  updateUserDetails
+  updateUserDetails,
+  getUserChannelProfile
  }

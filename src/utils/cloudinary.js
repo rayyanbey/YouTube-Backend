@@ -1,8 +1,8 @@
 import { v2 as cloudinary } from "cloudinary"
 import fs from "fs"
-import dotenv from 'dotenv'
+import dotenv from "dotenv"
 dotenv.config({
-  path: '../.env'
+  path: "../.env",
 })
 //Cloudinary Configuration
 cloudinary.config({
@@ -10,11 +10,7 @@ cloudinary.config({
   api_key: process.env.API_KEY,
   api_secret: process.env.SECRET,
 })
-// console.log("Cloudinary Config: ", {
-//   cloud_name: process.env.NAME,
-//   api_key: process.env.API_KEY,
-//   api_secret: process.env.SECRET,
-// })
+
 const uploadOnCloudinary = async (localFilePath) => {
   console.log("Local File Path:", localFilePath)
   try {
@@ -24,7 +20,8 @@ const uploadOnCloudinary = async (localFilePath) => {
 
     // Upload on Cloudinary
     let response = await cloudinary.uploader.upload(localFilePath, {
-      resource_type: "auto"
+      resource_type: "auto",
+      public_id: "images",
     })
 
     // Uploaded on Cloudinary
@@ -38,4 +35,11 @@ const uploadOnCloudinary = async (localFilePath) => {
   }
 }
 
-export { uploadOnCloudinary }
+const deleteFromCloudinary = async () => {
+  cloudinary.uploader.destroy("sample", (result) => {
+    console.log(result)
+  })
+}
+
+export { uploadOnCloudinary, deleteFromCloudinary
+}

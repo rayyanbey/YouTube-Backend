@@ -2,7 +2,7 @@ import { User } from "../models/user.models.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 
 
 const changeAvatar = asyncHandler(async(req,res)=>{
@@ -18,6 +18,7 @@ const changeAvatar = asyncHandler(async(req,res)=>{
     if(!avatarResponse){
         throw new ApiError(400,"Avatar is Required")
     }
+    await deleteFromCloudinary()
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
@@ -48,6 +49,7 @@ const changeCoverImage = asyncHandler(async(req,res)=>{
     if(!coverResponse){
         throw new ApiError(400,"Cover Image is Required")
     }
+    await deleteFromCloudinary()
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {

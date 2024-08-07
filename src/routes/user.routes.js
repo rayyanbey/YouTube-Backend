@@ -14,7 +14,7 @@ router.route("/change-avatar").post(verifyJWT,upload.fields([{name: "avatar",max
 router.route("/change-cover-image").post(verifyJWT,upload.fields([{name: "coverImage",maxCount:1}]),changeCoverImage)
 router.route("/get-current-user").get(verifyJWT,getCurrentuser)
 router.route("/update-details").patch(verifyJWT,updateUserDetails)
-router.route("/get-channel-profile").get(verifyJWT,getUserChannelProfile)
+router.route("/channel/:username").get(verifyJWT,getUserChannelProfile)
 router.route("/get-watchHistory").get(verifyJWT,getWatchHistory)
 router.route("/logout").post(verifyJWT,logoutUser)
 router.route("/refresh-token").post(refreshAccessToken)

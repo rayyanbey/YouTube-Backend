@@ -4,6 +4,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import  jwt  from "jsonwebtoken"
+import mongoose from "mongoose"
 
 const generateAccessAndRefreshTokens = async(userId)=>{
     try{
@@ -312,6 +313,52 @@ const getUserChannelProfile = asyncHandler(async(req,res)=>{
   .json(new ApiResponse(200,channel[0],"Information regarding user fetcheds"))
 })
 
+//Aggregate piplines are direct with mongoDB they don't go through mongoose
+const getWatchHistory = asyncHandler(async (req,res)=>{
+  const user = await User.aggregate([
+    {
+      $match:{
+        _id: new mongoose.Types.ObjectId(req.user._id)
+      }
+    },
+    {
+      $lookup:{
+        from: "videos",
+        localField:"watchHistory",
+        foreignField: "_id",
+        as: "WatchHistory",
+        pipeline:[
+          {
+            $lookup:{
+              from: "users",
+              localField: "owner",
+              foreignField:"_id",
+              as:"owner",
+              pipeline:{
+                $project:{
+                  FullName: 1,
+                  email: 1,
+                  avatar:1
+                }
+              }
+            }
+          },
+          {
+            $addFields:{
+              owner:{
+                $first: "$owner"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ])
+
+  return res.status(200)
+  .json(new ApiResponse(200,user[0].WatchHistory,"Watch History Fetched Successfully"))
+})
+
 
 export { 
   registerUser,
@@ -321,5 +368,6 @@ export {
   changePassword,
   getCurrentuser,
   updateUserDetails,
-  getUserChannelProfile
+  getUserChannelProfile,
+  getWatchHistory
  }

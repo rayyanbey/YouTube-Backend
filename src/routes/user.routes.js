@@ -2,7 +2,7 @@ import { Router } from "express";
 import { changePassword, getCurrentuser, getUserChannelProfile, getWatchHistory, loginUser, logoutUser, refreshAccessToken, registerUser, updateUserDetails } from "../controllers/user.controllers.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import changeAvatar, { changeCoverImage } from "../controllers/changeImages.controllers.js";
+import {changeAvatar, changeCoverImage} from "../controllers/changeImages.controllers.js";
 
 const router = Router()
 
